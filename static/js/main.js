@@ -1,4 +1,7 @@
+// ================================================================ //
 // Theme toggle
+// ================================================================ //
+
 function initTheme() {
     // Check localStorage for saved theme, default to 'dark'
     const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -39,13 +42,66 @@ function toggleTheme() {
     updateThemeIcon(newTheme);
 }
 
-// Initialize theme on page load
+// ================================================================ //
+// Video Modal
+// ================================================================ //
+
+function openVideoModal() {
+    const modal = document.getElementById('video-modal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeVideoModal() {
+    const modal = document.getElementById('video-modal');
+    const iframe = document.getElementById('video-iframe');
+
+    if (modal) {
+        modal.classList.remove('active');
+    }
+
+    // Stop video playback by resetting iframe src
+    if (iframe) {
+        const src = iframe.src;
+        iframe.src = '';
+        iframe.src = src;
+    }
+}
+
+// ================================================================ //
+// Initialize on page load
+// ================================================================ //
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize theme
     initTheme();
 
-    // Attach toggle listener
+    // Attach theme toggle listener
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    // Attach video modal listeners
+    const videoBtn = document.getElementById('video-btn');
+    const videoModal = document.getElementById('video-modal');
+    const modalClose = document.getElementById('modal-close');
+
+    if (videoBtn) {
+        videoBtn.addEventListener('click', openVideoModal);
+    }
+
+    if (modalClose) {
+        modalClose.addEventListener('click', closeVideoModal);
+    }
+
+    // Close modal when clicking outside the content
+    if (videoModal) {
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
     }
 });
