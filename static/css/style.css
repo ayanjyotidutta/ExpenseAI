@@ -772,3 +772,62 @@ a {
         max-height: 70vh;
     }
 }
+
+/* ------------------------------------------------------------------ */
+/* Landing page - Center aligned                                       */
+/* ------------------------------------------------------------------ */
+
+.hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+}
+
+.hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero-badge {
+    display: inline-block;
+}
+
+.hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-actions {
+    justify-content: center;
+}
+
+.hero-actions .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    height: 44px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Features - Center aligned                                           */
+/* ------------------------------------------------------------------ */
+
+.feature-card {
+    text-align: center;
+}
+
+.feature-icon {
+    display: flex;
+    justify-content: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Ensure mock-visual is centered                                      */
+/* ------------------------------------------------------------------ */
+
+.hero-visual {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
