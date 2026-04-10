@@ -6,8 +6,8 @@
     /* Dark theme (default) */
     --ink: #f0f0f0;
     --ink-soft: #c8c8c8;
-    --ink-muted: #9a9a9a;
-    --ink-faint: #666666;
+    --ink-muted: #ece9e9;
+    --ink-faint: #d2cfcf;
     --paper: #121212;
     --paper-warm: #1a1a1a;
     --paper-card: #1e1e1e;
@@ -225,7 +225,7 @@ a {
 }
 
 [data-theme="dark"] .hero-title {
-    color: var(--ink);
+    color: var(--ink-muted);
 }
 
 .hero-title em {
@@ -658,7 +658,7 @@ a {
 }
 
 .footer .brand-icon {
-    color: var(--accent-2);
+    color: var(--accent);
     font-size: 1.5rem;
 }
 
