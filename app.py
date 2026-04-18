@@ -1,7 +1,7 @@
 import sqlite3
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import create_user, get_db, get_user_by_email, init_db, seed_db
 
@@ -22,9 +22,31 @@ def landing():
     return render_template("landing.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    if request.method == "GET":
+        return render_template("register.html")
+
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
+    confirm_password = request.form.get("confirm_password", "")
+
+    if not name or not email or not password or not confirm_password:
+        flash("All fields are required.")
+        return render_template("register.html", form=request.form)
+
+    if password != confirm_password:
+        flash("Passwords do not match.")
+        return render_template("register.html", form=request.form)
+
+    if get_user_by_email(email):
+        flash("An account with that email already exists.")
+        return render_template("register.html", form=request.form)
+
+    create_user(name, email, generate_password_hash(password))
+    flash("Account created! Please sign in.")
+    return redirect(url_for("login"))
 
 
 @app.route("/login")
