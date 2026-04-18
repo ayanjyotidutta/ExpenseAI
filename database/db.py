@@ -54,12 +54,12 @@ def seed_db():
     hashed_password = generate_password_hash('demo123')
     db.execute(
         'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
-        ('Demo User', 'demo@ExpenseAI.com', hashed_password)
+        ('Demo User', 'demo@expenseai.com', hashed_password)
     )
     db.commit()
 
     # Fetch the inserted user's id
-    demo_user = db.execute('SELECT id FROM users WHERE email = ?', ('demo@ExpenseAI.com',)).fetchone()
+    demo_user = db.execute('SELECT id FROM users WHERE email = ?', ('demo@expenseai.com',)).fetchone()
     user_id = demo_user['id']
 
     # Insert 8 sample expenses covering all categories
@@ -91,10 +91,16 @@ def create_user(name, email, password_hash):
 
 
 def get_user_by_email(email):
-    """Gets a user by email"""
+    """Gets a user by email (case-insensitive)"""
     db = get_db()
-    user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    user = db.execute('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', (email,)).fetchone()
     return user
+
+
+def get_user_by_id(user_id):
+    """Gets a user by id"""
+    db = get_db()
+    return db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
 
 
 def get_expenses_by_user(user_id):
