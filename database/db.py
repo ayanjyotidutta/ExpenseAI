@@ -95,3 +95,12 @@ def get_user_by_email(email):
     db = get_db()
     user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
     return user
+
+
+def get_expenses_by_user(user_id):
+    """Returns all expenses for a user, newest first"""
+    db = get_db()
+    return db.execute(
+        'SELECT * FROM expenses WHERE user_id = ? ORDER BY date DESC',
+        (user_id,)
+    ).fetchall()

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — ExpenseAI{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-inner">
+
+        <div class="profile-header">
+            <div>
+                <h1 class="profile-title">Welcome back, {{ session['user_name'] }}</h1>
+                <p class="profile-subtitle">Here's a summary of your expenses</p>
+            </div>
+            <div class="profile-total">
+                <span class="total-label">Total spent</span>
+                <span class="total-amount">₹{{ "%.2f"|format(total) }}</span>
+            </div>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+        <div class="auth-error">{{ message }}</div>
+        {% endfor %}
+
+        {% if expenses %}
+        <div class="expense-table-wrap">
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="amount-col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                    <tr>
+                        <td class="date-cell">{{ expense['date'] }}</td>
+                        <td><span class="category-badge">{{ expense['category'] }}</span></td>
+                        <td class="desc-cell">{{ expense['description'] or '—' }}</td>
+                        <td class="amount-col amount-cell">₹{{ "%.2f"|format(expense['amount']) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No expenses yet. Add your first one to get started.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

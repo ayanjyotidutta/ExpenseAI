@@ -26,8 +26,12 @@
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
                     <span class="theme-icon">🌙</span>
                 </button>
-                <a href="{{ url_for('login') }}">Sign In</a>
-                <a href="{{ url_for('register') }}" class="nav-cta">Get Started</a>
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('logout') }}">Sign Out</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Sign In</a>
+                    <a href="{{ url_for('register') }}" class="nav-cta">Get Started</a>
+                {% endif %}
             </div>
         </div>
     </nav>
