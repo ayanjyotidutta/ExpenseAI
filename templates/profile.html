@@ -6,43 +6,93 @@
 <section class="profile-section">
     <div class="profile-inner">
 
-        <div class="profile-header">
-            <div>
-                <h1 class="profile-title">Welcome back, {{ session['user_name'] }}</h1>
-                <p class="profile-subtitle">Here's a summary of your expenses</p>
-            </div>
-            <div class="profile-total">
-                <span class="total-label">Total spent</span>
-                <span class="total-amount">₹{{ "%.2f"|format(total) }}</span>
-            </div>
-        </div>
-
         {% for message in get_flashed_messages() %}
         <div class="auth-error">{{ message }}</div>
         {% endfor %}
 
+        <!-- User identity card -->
+        <div class="user-card">
+            <div class="user-avatar">{{ initials }}</div>
+            <div class="user-info">
+                <div class="user-info-name">{{ user['name'] }}</div>
+                <div class="user-info-email">{{ user['email'] }}</div>
+                {% if member_since %}<div class="user-info-since">Member since {{ member_since }}</div>{% endif %}
+            </div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <span class="stat-card-label">Total Spent</span>
+                <span class="stat-card-value">₹{{ "%.2f"|format(stats.total) }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-label">Transactions</span>
+                <span class="stat-card-value">{{ stats.count }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-label">Top Category</span>
+                <span class="stat-card-value">{{ stats.top_category }}</span>
+            </div>
+        </div>
+
+        <!-- Add expense button -->
+        <a href="{{ url_for('add_expense') }}" class="btn-add-expense">
+            <i data-lucide="plus-circle"></i>
+            Add Expense
+        </a>
+
         {% if expenses %}
-        <div class="expense-table-wrap">
-            <table class="expense-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th class="amount-col">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for expense in expenses %}
-                    <tr>
-                        <td class="date-cell">{{ expense['date'] }}</td>
-                        <td><span class="category-badge">{{ expense['category'] }}</span></td>
-                        <td class="desc-cell">{{ expense['description'] or '—' }}</td>
-                        <td class="amount-col amount-cell">₹{{ "%.2f"|format(expense['amount']) }}</td>
-                    </tr>
+        <!-- Two-column grid: transactions + by-category -->
+        <div class="profile-grid">
+
+            <!-- Recent transactions -->
+            <div class="transactions-panel">
+                <div class="panel-title">Recent Transactions</div>
+                <div class="expense-table-scroll">
+                    <table class="expense-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th class="amount-col">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                            {% set cat_class = 'cat-' + expense['category']|lower|replace(' ', '-') %}
+                            <tr>
+                                <td class="date-cell">{{ expense['date'] }}</td>
+                                <td class="desc-cell">{{ expense['description'] or '—' }}</td>
+                                <td><span class="category-badge {{ cat_class }}">{{ expense['category'] }}</span></td>
+                                <td class="amount-col amount-cell">₹{{ "%.2f"|format(expense['amount']) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- By category breakdown -->
+            <div class="category-panel">
+                <div class="panel-title">By Category</div>
+                <div class="category-rows">
+                    {% for category, amount in stats.category_totals.items()|sort(attribute='1', reverse=True) %}
+                    {% set cat_class = 'cat-' + category|lower|replace(' ', '-') %}
+                    <div class="category-row">
+                        <div class="category-row-top">
+                            <span class="category-row-label">{{ category }}</span>
+                            <span class="category-row-amount">₹{{ "%.2f"|format(amount) }}</span>
+                        </div>
+                        <div class="category-row-track">
+                            <div class="category-row-bar {{ cat_class }}" style="width: {{ (amount / stats.max_category * 100)|round(1) }}%"></div>
+                        </div>
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
+                </div>
+            </div>
+
         </div>
         {% else %}
         <div class="empty-state">

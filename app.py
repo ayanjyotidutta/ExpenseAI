@@ -3,7 +3,7 @@ import sqlite3
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from database.db import create_user, get_db, get_expenses_by_user, get_user_by_email, init_db, seed_db
+from database.db import create_user, get_db, get_expenses_by_user, get_user_by_email, get_user_by_id, init_db, seed_db
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
@@ -30,7 +30,7 @@ def register():
         return render_template("register.html")
 
     name = request.form.get("name", "").strip()
-    email = request.form.get("email", "").strip()
+    email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
     confirm_password = request.form.get("confirm_password", "")
 
@@ -58,7 +58,7 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
 
-    email = request.form.get("email", "").strip()
+    email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
 
     if not email or not password:
@@ -100,9 +100,45 @@ def logout():
 def profile():
     if "user_id" not in session:
         return redirect(url_for("login"))
+
+    user = get_user_by_id(session["user_id"])
     expenses = get_expenses_by_user(session["user_id"])
-    total = sum(e["amount"] for e in expenses)
-    return render_template("profile.html", expenses=expenses, total=total)
+
+    category_totals = {}
+    for e in expenses:
+        category_totals[e["category"]] = category_totals.get(e["category"], 0) + e["amount"]
+
+    top_category = max(category_totals, key=category_totals.get) if category_totals else "—"
+    max_category = max(category_totals.values(), default=0)
+
+    # Format member since date: "15 Jan 2025"
+    from datetime import datetime
+    raw_date = user["created_at"] if user and user["created_at"] else ""
+    try:
+        member_since = datetime.strptime(raw_date[:10], "%Y-%m-%d").strftime("%-d %b %Y")
+    except (ValueError, TypeError):
+        member_since = ""
+
+    # Build initials from name
+    parts = (user["name"] if user else "").split()
+    initials = (parts[0][0] + parts[-1][0]).upper() if len(parts) >= 2 else (parts[0][:2].upper() if parts else "?")
+
+    stats = {
+        "total": sum(e["amount"] for e in expenses),
+        "count": len(expenses),
+        "top_category": top_category,
+        "category_totals": category_totals,
+        "max_category": max_category,
+    }
+
+    return render_template(
+        "profile.html",
+        expenses=expenses,
+        stats=stats,
+        user=user,
+        initials=initials,
+        member_since=member_since,
+    )
 
 
 @app.route("/expenses/add")
